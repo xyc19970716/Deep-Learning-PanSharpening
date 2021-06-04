@@ -5,7 +5,6 @@ import torch.nn.functional as F
 from torch.nn import init
 import functools
 from torch.optim import lr_scheduler
-import config as cfg
 from scipy import linalg
 import kornia
 import cupy as cp
@@ -67,24 +66,25 @@ def init_net(net, init_type='normal', init_gain=0.02, gpu_ids=[]):
     return net
 
 
-def get_scheduler(optimizer):
-    if cfg.lr_policy == 'step':
-        scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=cfg.lr_decay_iters, gamma=cfg.lr_decay_factor)#StepLR(optimizer, step_size=cfg.lr_decay_iters, gamma=cfg.lr_decay_factor)
-    elif cfg.lr_policy == 'cosine':
-        scheduler = lr_scheduler.CosineAnnealingLR(optimizer, T_max=cfg.epochs)
+def get_scheduler(optimizer, args):
+    if args.lr_policy == 'step':
+        scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=args.lr_decay_iters, gamma=args.lr_decay_factor)#StepLR(optimizer, step_size=cfg.lr_decay_iters, gamma=cfg.lr_decay_factor)
+    elif args.lr_policy == 'cosine':
+        scheduler = lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.epochs)
     return scheduler
 
 
 class GANLoss(nn.Module):
-    def __init__(self, target_real_label=1.0, target_fake_label=0.0):
+    def __init__(self, args, target_real_label=1.0, target_fake_label=0.0):
         super(GANLoss, self).__init__()
+        self.args = args
         self.register_buffer('real_label', torch.tensor(target_real_label))
         self.register_buffer('fake_label', torch.tensor(target_fake_label))
-        if cfg.gan_mode == 'lsgan':
+        if args.gan_mode == 'lsgan':
             self.loss = nn.MSELoss()
-        elif cfg.gan_mode == 'vanilla':
+        elif args.gan_mode == 'vanilla':
             self.loss = nn.BCEWithLogitsLoss()
-        elif cfg.gan_mode == 'wgangp':
+        elif args.gan_mode == 'wgangp':
             self.loss = None
 
     def get_target_tensor(self, input, target_is_real):
@@ -95,10 +95,10 @@ class GANLoss(nn.Module):
         return target_tensor.expand_as(input)
 
     def __call__(self, input, target_is_real):
-        if cfg.gan_mode in ['lsgan', 'vanilla']:
+        if self.args.gan_mode in ['lsgan', 'vanilla']:
             target_tensor = self.get_target_tensor(input, target_is_real)
             loss = self.loss(input, target_tensor)
-        elif cfg.gan_mode == 'wgangp':
+        elif self.args.gan_mode == 'wgangp':
             if target_is_real:
                 loss = -input.mean()
             else:
@@ -280,24 +280,30 @@ class OursLoss2(nn.Module):
        
 
     def forward(self, lr_ms, hr_pan, fuse_ms, hr_ms):
-        loss1 = self.mseloss(fuse_ms, hr_ms)
- 
-        return loss1
+        # b,c,h,w = lr_ms.shape
         
+        # down = torch.nn.functional.upsample(fuse_ms, scale_factor=1/4,mode='bicubic')
+        # loss1 = self.mseloss(down, lr_ms)
+        # hp = hr_pan - kornia.filters.GaussianBlur2d((3,3),(1,1))(hr_pan.repeat(1, c, 1, 1))
+        # out_hp = fuse_ms - kornia.filters.GaussianBlur2d((3,3),(1,1))(fuse_ms)
+        # loss2 = self.mseloss(hp, out_hp)
+        # return 100*loss1 + loss2
+        return self.mseloss(fuse_ms, hr_ms)
         
 
        
 
 class DIPLoss(nn.Module):
-    def __init__(self, device):
+    def __init__(self, device, args):
         super(DIPLoss, self).__init__()
-
-        self.ssimmulloss = SSIM(data_range=1, channel=cfg.mul_channel).to(device)
+        self.l1_loss = nn.L1Loss().to(device)
+        self.ssimmulloss = SSIM(data_range=1, channel=args.mul_channel).to(device)
         
     def forward(self, lr_ms, hr_pan, fuse_ms, hr_ms):
-      
-        loss_whole =1 - self.ssimmulloss(fuse_ms, hr_ms)
-        
+        a = 0.84
+        loss_l1 = self.l1_loss(fuse_ms, hr_ms)
+        loss_ssim =1 - self.ssimmulloss(fuse_ms, hr_ms)
+        loss_whole = loss_ssim * a + loss_l1*(1-a)
         return loss_whole
 
 

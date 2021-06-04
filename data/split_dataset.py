@@ -3,7 +3,7 @@ import os
 import glob
 import numpy as np
 import random
-
+from tqdm import tqdm
 
 
 def read_tiff(input_file):
@@ -90,7 +90,7 @@ def world2Pixel(geoMatrix, x, y):
 
 # would like to update to clip image by the format of 16 bit
 satellite = '' #'wv2'
-input_data_path = r'./'
+input_data_path = r'D:\实验\影像融合\QB-Dataset'
 input_ms_path = glob.glob(os.path.join(os.path.join(input_data_path, 'MS'), '*.tif'))
 input_pan_path = glob.glob(os.path.join(os.path.join(input_data_path, 'PAN'), '*.tif'))
 print(input_ms_path, input_pan_path)
@@ -99,7 +99,7 @@ print('共有{}对影像'.format(len(input_pan_path)))
 
             
 # 先开始随机打乱数据集
-test_path = r'./test_dataset'
+test_path = os.path.join(input_data_path,'test_dataset')
 if not os.path.exists(test_path):
     os.makedirs(test_path)
 
@@ -111,7 +111,7 @@ if not os.path.exists(test_hr_path):
 if not os.path.exists(test_lr_path):
     os.makedirs(test_lr_path)
 
-train_temp_path = r'./train_dataset'
+train_temp_path = os.path.join(input_data_path,'train_dataset')
 if not os.path.exists(train_temp_path):
     os.makedirs(train_temp_path)
 
@@ -134,7 +134,7 @@ random.seed(0)
 random.shuffle(input_pan_path)
 
 
-border_idx = int(len(input_ms_path)-200)#int(len(input_ms_path) * (1-spilt_factor))#
+border_idx = int(len(input_ms_path)-500)#int(len(input_ms_path) * (1-spilt_factor))#
 
 # train
 print('开始随机分割数据集')

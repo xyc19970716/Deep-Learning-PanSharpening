@@ -29,16 +29,16 @@ def gdal_read(input_file):
 
 
 
-def transform(LR, HR, FR):
+def transform(LR, HR, FR, args):
     # this implmented fits the format of c,h,w
 
     # 随机裁剪
     c, h, w = LR.shape
-    size = cfg.img_size
+    size = args.img_size
     location_x = random.randint(0, h-size)
     location_y = random.randint(0, w-size)
-    FR = FR[:, location_x*cfg.scale:(location_x+size)*cfg.scale, location_y*cfg.scale:(location_y+size)*cfg.scale]
-    HR = HR[:, location_x*cfg.scale:(location_x+size)*cfg.scale, location_y*cfg.scale:(location_y+size)*cfg.scale]
+    FR = FR[:, location_x*args.scale:(location_x+size)*args.scale, location_y*args.scale:(location_y+size)*args.scale]
+    HR = HR[:, location_x*args.scale:(location_x+size)*args.scale, location_y*args.scale:(location_y+size)*args.scale]
     LR = LR[:, location_x:location_x+size, location_y:location_y+size] 
 
     if random.random() < 0.5:
@@ -74,12 +74,12 @@ def transform(LR, HR, FR):
     return LR, HR, FR
 
 class PsDataset(data.Dataset):
-    def __init__(self, apath, isAug=True, isUnlabel=False):
+    def __init__(self, args, apath, isAug=True, isUnlabel=False):
         self.isAug = isAug
         self.isUnlabel = isUnlabel
-        self.scale = cfg.scale
+        self.scale = args.scale
         # apath = cfg.dataDir
-        
+        self.args = args
       
         dirHR = 'HR'
         dirLR = 'LR'
@@ -94,11 +94,11 @@ class PsDataset(data.Dataset):
         self.HRList = glob.glob(os.path.join(self.dirTar, '*.tif'))
         self.FRList = glob.glob(os.path.join(self.dirFR, '*.tif'))
         # 随机打乱数据集
-        random.seed(cfg.seed)
+        random.seed(args.seed)
         random.shuffle(self.LRList)
-        random.seed(cfg.seed)
+        random.seed(args.seed)
         random.shuffle(self.HRList)
-        random.seed(cfg.seed)
+        random.seed(args.seed)
         random.shuffle(self.FRList)
       
         self.len = len(self.LRList)
@@ -111,12 +111,12 @@ class PsDataset(data.Dataset):
         lr, hr, fr = LR, HR, FR
         if self.isAug:
             
-            lr, hr, fr = self.transform(LR, HR, FR)
+            lr, hr, fr = self.transform(LR, HR, FR, self.args)
        
    
-        lr = torch.Tensor(lr).float() / cfg.data_range
-        hr = torch.Tensor(hr).float() / cfg.data_range
-        fr = torch.Tensor(fr).float() / cfg.data_range
+        lr = torch.Tensor(lr).float() / self.args.data_range
+        hr = torch.Tensor(hr).float() / self.args.data_range
+        fr = torch.Tensor(fr).float() / self.args.data_range
         return lr, hr, fr
         
     def __len__(self):

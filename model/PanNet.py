@@ -6,14 +6,14 @@ import torch.nn as nn
 import torch
 from .base_model import BaseModel
 from . import networks
-import config as cfg
+
 import numpy as np
 import cv2
 import kornia
 
     
 import torch
-import config as cfg
+
 class Residual_Block(nn.Module):
     def __init__(self, channels):
         super(Residual_Block, self).__init__()
@@ -31,18 +31,19 @@ class Residual_Block(nn.Module):
        
 
 class PanNet_model(nn.Module):
-    def __init__(self):
+    def __init__(self, args):
         super(PanNet_model, self).__init__()
+        self.args = args
         self.layer_0 = nn.Sequential(
-            nn.ConvTranspose2d(in_channels=cfg.mul_channel, out_channels=cfg.mul_channel, kernel_size=8, stride=4, padding=2, output_padding=0)
+            nn.ConvTranspose2d(in_channels=args.mul_channel, out_channels=args.mul_channel, kernel_size=8, stride=4, padding=2, output_padding=0)
         )
         self.layer_1 = nn.Sequential(
-            nn.Conv2d(in_channels=cfg.pan_channel+cfg.mul_channel, out_channels=32, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(in_channels=args.pan_channel+args.mul_channel, out_channels=32, kernel_size=3, stride=1, padding=1),
             nn.ReLU()
         )
         self.layer_2 = nn.Sequential(
             self.make_layer(Residual_Block, 4, 32),
-            nn.Conv2d(in_channels=32, out_channels=cfg.mul_channel, kernel_size=3, stride=1, padding=1)
+            nn.Conv2d(in_channels=32, out_channels=args.mul_channel, kernel_size=3, stride=1, padding=1)
         )
 
         self.bicubic = networks.bicubic()
@@ -54,7 +55,7 @@ class PanNet_model(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x, y):
-        lr_up = self.bicubic(x, scale=cfg.scale)#torch.nn.functional.interpolate(lr, scale_factor=cfg.scale, mode='bicubic')
+        lr_up = self.bicubic(x, scale=self.args.scale)#torch.nn.functional.interpolate(lr, scale_factor=cfg.scale, mode='bicubic')
         lr_hp = x - kornia.filters.BoxBlur((5, 5))(x)
         pan_hp = y - kornia.filters.BoxBlur((5, 5))(y)
         lr_u_hp = self.layer_0(lr_hp)#self.bicubic(lr_hp, scale=cfg.scale)#
@@ -68,14 +69,15 @@ class PanNet_model(nn.Module):
     
 class PanNetModel(BaseModel):
 
-    def initialize(self):
-        BaseModel.initialize(self)
-        self.save_dir = os.path.join(cfg.checkpoints_dir, cfg.model) # 定义checkpoints路径
+    def initialize(self, args):
+        self.args = args
+        BaseModel.initialize(self, args)
+        self.save_dir = os.path.join(args.checkpoints_dir, args.model) # 定义checkpoints路径
         if not os.path.exists(self.save_dir):
             os.makedirs(self.save_dir)
             print("Create file path: ", self.save_dir)
         
-        if cfg.isUnlabel:
+        if args.isUnlabel:
             self.save_dir = os.path.join(self.save_dir, 'unsupervised')
         else:
             self.save_dir = os.path.join(self.save_dir, 'supervised')
@@ -94,14 +96,14 @@ class PanNetModel(BaseModel):
         # load/define networks
         # The naming conversion is different from those used in the paper
         # Code (paper): G_A (G), G_B (F), D_A (D_Y), D_B (D_X)
-        self.netG = networks.init_net(PanNet_model()).cuda()
+        self.netG = networks.init_net(PanNet_model(args)).cuda()
         
 
         if self.isTrain:
             
             
             # define loss functions
-            if cfg.isUnlabel:
+            if args.isUnlabel:
                 self.criterionL1 = networks.OursLoss(scale=cfg.scale, device=self.device)#
             else:
              
@@ -109,11 +111,11 @@ class PanNetModel(BaseModel):
           
             
             # initialize optimizers
-            if cfg.optim_type == 'adam':
+            if args.optim_type == 'adam':
                 self.optimizer_G = torch.optim.Adam(self.netG.parameters(),
-                                                    lr=cfg.lr, betas=(cfg.beta, 0.999), weight_decay=cfg.weight_decay)
-            elif cfg.optim_type == 'sgd':
-                self.optimizer_G = torch.optim.SGD(self.netG.parameters(), lr=cfg.lr, momentum=cfg.momentum)
+                                                    lr=args.lr, betas=(args.beta, 0.999), weight_decay=args.weight_decay)
+            elif args.optim_type == 'sgd':
+                self.optimizer_G = torch.optim.SGD(self.netG.parameters(), lr=args.lr, momentum=args.momentum)
 
             
             self.optimizers = []
@@ -127,7 +129,7 @@ class PanNetModel(BaseModel):
             input (dict): include the data itself and its metadata information.
         The option 'direction' can be used to swap domain A and domain B.
         """
-        if cfg.isUnlabel:
+        if self.args.isUnlabel:
             self.real_A_1 = input_dict['A_1'].to(self.device)  # mul
             self.real_A_2 = input_dict['A_2'].to(self.device)  # pan
         else:
@@ -139,14 +141,14 @@ class PanNetModel(BaseModel):
     def forward(self):
         """Run forward pass; called by both functions <optimize_parameters> and <test>."""
        
-        if cfg.isUnlabel:
+        if self.args.isUnlabel:
             self.fake_B, self.fake_pan = self.netG(self.real_A_1, self.real_A_2) 
         else:
             self.fake_B = self.netG(self.real_A_1, self.real_A_2)
 
     def backward_G(self):
         """Calculate GAN and L1 loss for the generator"""
-        if cfg.isUnlabel:
+        if self.args.isUnlabel:
             self.loss_G = self.criterionL1(self.real_A_1, self.real_A_2,self.fake_B, self.fake_pan)
         else:
         

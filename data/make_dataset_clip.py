@@ -92,9 +92,9 @@ def world2Pixel(geoMatrix, x, y):
 
 # would like to update to clip image by the format of 16 bit
 satellite = '' #'wv2'
-# input_data_path = r'./'
-input_ms_path = glob.glob(os.path.join('mul', '*.tif'))#r'./ms.tif'
-input_pan_path = glob.glob(os.path.join('pan', '*.tif'))#r'./pan.tif'
+input_data_path = r'D:\实验\影像融合\PSData\QB'
+input_ms_path = glob.glob(os.path.join(input_data_path, "mul", "*.TIF"))#r'./ms.tif'
+input_pan_path = glob.glob(os.path.join(input_data_path, "pan", "*.TIF"))#r'./pan.tif'
 print(input_ms_path, input_pan_path)
 # print('共有{}对影像'.format(len(input_pan_path)))
 clip_size = 1024#256#128#50 #112
@@ -109,7 +109,7 @@ align_by_geo = True
 
 print('裁剪')
 random.seed(19970716)
-save_path = r'./train_dataset'
+save_path = os.path.join(input_data_path, 'dataset1')
 if not os.path.exists(save_path):
     os.makedirs(save_path)
 
@@ -123,7 +123,7 @@ if not os.path.exists(save_lr_path):
 
 
 # make dataset
-data_index = 0 # global data index
+data_index = 1222 # global data index
 for i, ms_path in enumerate(input_ms_path):
     print(i)
     lr_array_data,lr_geo,lr_proj,lr_rows,lr_cols,lr_couts = read_tiff(ms_path)

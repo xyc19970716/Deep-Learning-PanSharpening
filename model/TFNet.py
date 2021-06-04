@@ -16,10 +16,11 @@ import torch
 import math
 import config as cfg
 class TFNet_model(nn.Module):
-    def __init__(self):
+    def __init__(self, args):
         super(TFNet_model, self).__init__()
+        self.args = args
         self.encoder1_pan=nn.Sequential(
-            nn.Conv2d(in_channels=cfg.pan_channel,
+            nn.Conv2d(in_channels=args.pan_channel,
                       out_channels=32,
                       kernel_size=3,
                       stride=1,
@@ -40,7 +41,7 @@ class TFNet_model(nn.Module):
             nn.PReLU()
         )
         self.encoder1_lr=nn.Sequential(
-            nn.Conv2d(in_channels=cfg.mul_channel,
+            nn.Conv2d(in_channels=args.mul_channel,
                       out_channels=32,
                       kernel_size=3,
                       stride=1,
@@ -132,7 +133,7 @@ class TFNet_model(nn.Module):
                       padding=1),
             nn.PReLU(),
             nn.Conv2d(in_channels=64,
-                      out_channels=cfg.mul_channel,
+                      out_channels=args.mul_channel,
                       kernel_size=3,
                       stride=1,
                       padding=1),
@@ -141,7 +142,7 @@ class TFNet_model(nn.Module):
         self.bicubic = networks.bicubic()
       
     def forward(self, x_lr, x_pan):
-        x_lr = self.bicubic(x_lr, scale=cfg.scale)#torch.nn.functional.interpolate(x_lr, scale_factor=cfg.scale, mode='bicubic')
+        x_lr = self.bicubic(x_lr, scale=self.args.scale)#torch.nn.functional.interpolate(x_lr, scale_factor=cfg.scale, mode='bicubic')
         encoder1_pan = self.encoder1_pan(x_pan)
         encoder1_lr = self.encoder1_lr(x_lr)
 
@@ -160,14 +161,15 @@ class TFNet_model(nn.Module):
 class TFNetModel(BaseModel):
 
     
-    def initialize(self):
-        BaseModel.initialize(self)
-        self.save_dir = os.path.join(cfg.checkpoints_dir, cfg.model) # 定义checkpoints路径
+    def initialize(self, args):
+        self.args = args
+        BaseModel.initialize(self, args)
+        self.save_dir = os.path.join(args.checkpoints_dir, args.model) # 定义checkpoints路径
         if not os.path.exists(self.save_dir):
             os.makedirs(self.save_dir)
             print("Create file path: ", self.save_dir)
             
-        if cfg.isUnlabel:
+        if args.isUnlabel:
             self.save_dir = os.path.join(self.save_dir, 'unsupervised')
         else:
             self.save_dir = os.path.join(self.save_dir, 'supervised')
@@ -187,15 +189,15 @@ class TFNetModel(BaseModel):
         # load/define networks
         # The naming conversion is different from those used in the paper
         # Code (paper): G_A (G), G_B (F), D_A (D_Y), D_B (D_X)
-        self.netG = networks.init_net(TFNet_model()).cuda()
+        self.netG = networks.init_net(TFNet_model(args)).cuda()
         
 
         if self.isTrain:
             
             
             # define loss functions
-            if cfg.isUnlabel:
-                self.criterionL1 = networks.OursLoss(scale=cfg.scale, device=self.device)#
+            if args.isUnlabel:
+                self.criterionL1 = networks.OursLoss(scale=args.scale, device=self.device)#
             else:
                 self.criterionL1 = torch.nn.L1Loss()#networks.PanLoss(scale=cfg.scale, device=self.device)#
             
@@ -203,12 +205,12 @@ class TFNetModel(BaseModel):
             # initialize optimizers
             # self.optimizer_G = optim.AdamW(self.netG.parameters(),
             #                                     lr=cfg.lr, betas=(cfg.beta, 0.999), weight_decay=cfg.weight_decay)
-            if cfg.optim_type=='adam':
+            if args.optim_type=='adam':
                 self.optimizer_G = torch.optim.Adam(self.netG.parameters(),
-                                                    lr=cfg.lr, betas=(cfg.beta, 0.999), weight_decay=cfg.weight_decay)
-            elif cfg.optim_type=='sgd':
+                                                    lr=args.lr, betas=(args.beta, 0.999), weight_decay=args.weight_decay)
+            elif args.optim_type=='sgd':
                 self.optimizer_G = torch.optim.SGD(self.netG.parameters(),
-                                                    lr=cfg.lr, momentum=cfg.momentum, weight_decay=cfg.weight_decay)
+                                                    lr=args.lr, momentum=args.momentum, weight_decay=args.weight_decay)
 
             self.optimizers = []
             self.optimizers.append(self.optimizer_G)
@@ -221,7 +223,7 @@ class TFNetModel(BaseModel):
             input (dict): include the data itself and its metadata information.
         The option 'direction' can be used to swap domain A and domain B.
         """
-        if cfg.isUnlabel:
+        if self.args.isUnlabel:
             self.real_A_1 = input_dict['A_1'].to(self.device)  # mul
             self.real_A_2 = input_dict['A_2'].to(self.device)  # pan
         else:
@@ -232,14 +234,14 @@ class TFNetModel(BaseModel):
 
     def forward(self):
         """Run forward pass; called by both functions <optimize_parameters> and <test>."""
-        if cfg.isUnlabel:
+        if self.args.isUnlabel:
             self.fake_B, self.fake_pan = self.netG(self.real_A_1, self.real_A_2) 
         else:
             self.fake_B = self.netG(self.real_A_1, self.real_A_2) 
 
     def backward_G(self):
         """Calculate GAN and L1 loss for the generator"""
-        if cfg.isUnlabel:
+        if self.args.isUnlabel:
             self.loss_G = self.criterionL1(self.real_A_1, self.real_A_2,self.fake_B, self.fake_pan)
         else:
             self.loss_G = self.criterionL1(self.fake_B, self.real_B)

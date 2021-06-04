@@ -6,13 +6,13 @@ import torch.nn as nn
 import torch
 from .base_model import BaseModel
 from . import networks
-import config as cfg
+
 import numpy as np
 import cv2
 import kornia
     
 import torch
-import config as cfg
+
 class Residual_Block(nn.Module):
     def __init__(self, channels):
         super(Residual_Block, self).__init__()
@@ -28,42 +28,43 @@ class Residual_Block(nn.Module):
         return result
 
 class SRPPNN_model(nn.Module):
-    def __init__(self):
+    def __init__(self, args):
         super(SRPPNN_model, self).__init__()
+        self.args = args
         self.bicubic =networks.bicubic()
         self.pan_extract_1 = nn.Sequential(
-            nn.Conv2d(in_channels=cfg.pan_channel, out_channels=64, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(in_channels=args.pan_channel, out_channels=64, kernel_size=3, stride=1, padding=1),
             self.make_layer(Residual_Block, 10, 64),
-            nn.Conv2d(in_channels=64, out_channels=cfg.mul_channel, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(in_channels=64, out_channels=args.mul_channel, kernel_size=3, stride=1, padding=1),
         )
         self.pan_extract_2 = nn.Sequential(
-            nn.Conv2d(in_channels=cfg.mul_channel, out_channels=64, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(in_channels=args.mul_channel, out_channels=64, kernel_size=3, stride=1, padding=1),
             self.make_layer(Residual_Block, 10, 64),
-            nn.Conv2d(in_channels=64, out_channels=cfg.mul_channel, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(in_channels=64, out_channels=args.mul_channel, kernel_size=3, stride=1, padding=1),
             nn.MaxPool2d(kernel_size=2),
         )
         self.ms_up_1 = nn.Sequential(
-            nn.Conv2d(in_channels=cfg.mul_channel, out_channels=cfg.mul_channel*4, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(in_channels=args.mul_channel, out_channels=args.mul_channel*4, kernel_size=3, stride=1, padding=1),
             nn.PixelShuffle(2),
         )
         self.ms_up_2 = nn.Sequential(
-            nn.Conv2d(in_channels=cfg.mul_channel, out_channels=cfg.mul_channel*4, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(in_channels=args.mul_channel, out_channels=args.mul_channel*4, kernel_size=3, stride=1, padding=1),
             nn.PixelShuffle(2),
         )
 
-        self.conv_mul_pre_p1 = nn.Conv2d(in_channels=cfg.mul_channel, out_channels=32, kernel_size=3, stride=1, padding=1)
+        self.conv_mul_pre_p1 = nn.Conv2d(in_channels=args.mul_channel, out_channels=32, kernel_size=3, stride=1, padding=1)
         self.img_mul_p1_layer = self.make_layer(Residual_Block, 4, 32)
         self.conv_mul_post_p1 = nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3, stride=1, padding=1)
-        self.mul_grad_p1 = nn.Conv2d(in_channels=32, out_channels=cfg.mul_channel, kernel_size=3, stride=1, padding=1)
-        self.mul_grad_p2 = nn.Conv2d(in_channels=32, out_channels=cfg.mul_channel, kernel_size=3, stride=1, padding=1)
-        self.conv_pre_p1 = nn.Conv2d(in_channels=cfg.mul_channel+cfg.pan_channel, out_channels=32, kernel_size=3, stride=1, padding=1)
-        self.conv_pre_p2 = nn.Conv2d(in_channels=cfg.mul_channel+cfg.pan_channel, out_channels=32, kernel_size=3, stride=1, padding=1)
+        self.mul_grad_p1 = nn.Conv2d(in_channels=32, out_channels=args.mul_channel, kernel_size=3, stride=1, padding=1)
+        self.mul_grad_p2 = nn.Conv2d(in_channels=32, out_channels=args.mul_channel, kernel_size=3, stride=1, padding=1)
+        self.conv_pre_p1 = nn.Conv2d(in_channels=args.mul_channel+args.pan_channel, out_channels=32, kernel_size=3, stride=1, padding=1)
+        self.conv_pre_p2 = nn.Conv2d(in_channels=args.mul_channel+args.pan_channel, out_channels=32, kernel_size=3, stride=1, padding=1)
         self.img_p1_layer = self.make_layer(Residual_Block, 4, 32)
         self.conv_post_p1 = nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3, stride=1, padding=1)
         self.conv_post_p2 = nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3, stride=1, padding=1)
-        self.grad_p1 = nn.Conv2d(in_channels=32, out_channels=cfg.mul_channel, kernel_size=3, stride=1, padding=1)
-        self.grad_p2 = nn.Conv2d(in_channels=32, out_channels=cfg.mul_channel, kernel_size=3, stride=1, padding=1)
-        self.conv_mul_pre_p2 = nn.Conv2d(in_channels=cfg.mul_channel, out_channels=32, kernel_size=3, stride=1, padding=1)
+        self.grad_p1 = nn.Conv2d(in_channels=32, out_channels=args.mul_channel, kernel_size=3, stride=1, padding=1)
+        self.grad_p2 = nn.Conv2d(in_channels=32, out_channels=args.mul_channel, kernel_size=3, stride=1, padding=1)
+        self.conv_mul_pre_p2 = nn.Conv2d(in_channels=args.mul_channel, out_channels=32, kernel_size=3, stride=1, padding=1)
         self.img_mul_p2_layer = self.make_layer(Residual_Block, 4, 32)
         self.conv_mul_post_p2 = nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3, stride=1, padding=1)
         self.img_p2_layer = self.make_layer(Residual_Block, 4, 32)
@@ -121,14 +122,14 @@ class SRPPNN_model(nn.Module):
     
 class SRPPNNModel(BaseModel):
 
-    def initialize(self):
-        BaseModel.initialize(self)
-        self.save_dir = os.path.join(cfg.checkpoints_dir, cfg.model) # 定义checkpoints路径
+    def initialize(self, args):
+        BaseModel.initialize(self, args)
+        self.save_dir = os.path.join(args.checkpoints_dir, args.model) # 定义checkpoints路径
         if not os.path.exists(self.save_dir):
             os.makedirs(self.save_dir)
             print("Create file path: ", self.save_dir)
         
-        if cfg.isUnlabel:
+        if args.isUnlabel:
             self.save_dir = os.path.join(self.save_dir, 'unsupervised')
         else:
             self.save_dir = os.path.join(self.save_dir, 'supervised')
@@ -147,26 +148,26 @@ class SRPPNNModel(BaseModel):
         # load/define networks
         # The naming conversion is different from those used in the paper
         # Code (paper): G_A (G), G_B (F), D_A (D_Y), D_B (D_X)
-        self.netG = networks.init_net(SRPPNN_model()).cuda()
+        self.netG = networks.init_net(SRPPNN_model(args)).cuda()
         
 
         if self.isTrain:
             
             
             # define loss functions
-            if cfg.isUnlabel:
-                self.criterionL1 = networks.OursLoss(scale=cfg.scale, device=self.device)#
+            if args.isUnlabel:
+                self.criterionL1 = networks.OursLoss(scale=args.scale, device=self.device)#
             else:
             
                 self.criterionL1 = torch.nn.MSELoss()#networks.PanLoss(scale=cfg.scale, device=self.device)#
           
             
             # initialize optimizers
-            if cfg.optim_type == 'adam':
+            if args.optim_type == 'adam':
                 self.optimizer_G = torch.optim.Adam(self.netG.parameters(),
-                                                    lr=cfg.lr, betas=(cfg.beta, 0.999), weight_decay=cfg.weight_decay)
-            elif cfg.optim_type == 'sgd':
-                self.optimizer_G = torch.optim.SGD(self.netG.parameters(), lr=cfg.lr, momentum=cfg.momentum)
+                                                    lr=args.lr, betas=(args.beta, 0.999), weight_decay=args.weight_decay)
+            elif args.optim_type == 'sgd':
+                self.optimizer_G = torch.optim.SGD(self.netG.parameters(), lr=args.lr, momentum=args.momentum)
 
             self.optimizers = []
             self.optimizers.append(self.optimizer_G)
@@ -179,7 +180,7 @@ class SRPPNNModel(BaseModel):
             input (dict): include the data itself and its metadata information.
         The option 'direction' can be used to swap domain A and domain B.
         """
-        if cfg.isUnlabel:
+        if self.args.isUnlabel:
             self.real_A_1 = input_dict['A_1'].to(self.device)  # mul
             self.real_A_2 = input_dict['A_2'].to(self.device)  # pan
         else:
@@ -191,14 +192,14 @@ class SRPPNNModel(BaseModel):
     def forward(self):
         """Run forward pass; called by both functions <optimize_parameters> and <test>."""
        
-        if cfg.isUnlabel:
+        if self.args.isUnlabel:
             self.fake_B, self.fake_pan = self.netG(self.real_A_1, self.real_A_2) 
         else:
             self.fake_B = self.netG(self.real_A_1, self.real_A_2)
 
     def backward_G(self):
         """Calculate GAN and L1 loss for the generator"""
-        if cfg.isUnlabel:
+        if self.args.isUnlabel:
             self.loss_G = self.criterionL1(self.real_A_1, self.real_A_2,self.fake_B, self.fake_pan)
         else:
             

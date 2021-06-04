@@ -1,7 +1,6 @@
 import os
 import os.path
 import torch
-import config as cfg
 import numpy as np
 import cv2
 from scipy import ndimage
@@ -17,12 +16,12 @@ def findvalue(line, name):
     return value[0]
 
 class LossLog():
-    def __init__(self):
+    def __init__(self, args):
         # 初始化log,定义存储位置
-        self.save_dir = os.path.join(cfg.checkpoints_dir, cfg.model)
+        self.save_dir = os.path.join(args.checkpoints_dir, args.model+args.model_sub+args.model_loss)
         if not os.path.exists(self.save_dir):
             os.makedirs(self.save_dir)
-        if cfg.isUnlabel:
+        if args.isUnlabel:
             self.save_dir = os.path.join(self.save_dir, 'unsupervised')
         else:
             self.save_dir = os.path.join(self.save_dir, 'supervised')

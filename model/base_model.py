@@ -14,11 +14,11 @@ class BaseModel(ABC):
 
     def setup(self):
         if self.isTrain:
-            self.schedulers = [networks.get_scheduler(optimizer) for optimizer in self.optimizers]
-        if not self.isTrain or cfg.continue_train:
-            self.load_networks(cfg.which_epoch)
+            self.schedulers = [networks.get_scheduler(optimizer, self.args) for optimizer in self.optimizers]
+        if not self.isTrain or self.args.continue_train:
+            self.load_networks(self.args.which_epoch)
         # self.print_networks(opt.verbose)
-        self.print_named_networks(cfg.print_net_in_detail)
+        self.print_named_networks(self.args.print_net_in_detail)
 
     def set_requires_grad(self, nets, requires_grad=False):
         """Set requies_grad=Fasle for all the networks to avoid unnecessary computations
@@ -121,10 +121,10 @@ class BaseModel(ABC):
                 print('[Network %s] Total number of parameters : %.3f M' % (name, num_params / 1e6))
         print('-----------------------------------------------')
 
-    def initialize(self):
-        self.isTrain = cfg.isTrain # 是否训练
-        self.gpu_ids = cfg.gpu_ids # 显卡号
-        self.device = torch.device('cuda:{}'.format(cfg.gpu_ids[0])) if int(cfg.gpu_ids) > -1 else torch.device('cpu') # 设置设备
+    def initialize(self, args):
+        self.isTrain = args.isTrain # 是否训练
+        self.gpu_ids = args.gpu_ids # 显卡号
+        self.device = torch.device('cuda:{}'.format(args.gpu_ids)) if int(args.gpu_ids) > -1 else torch.device('cpu') # 设置设备
        
         self.loss_names = []
         self.model_names = []
@@ -132,7 +132,7 @@ class BaseModel(ABC):
         self.image_paths = []
         self.optimizers = []
         self.metric = 0
-       
+        self.args = args
 
         
         
@@ -174,14 +174,14 @@ class BaseModel(ABC):
         m, n, count = X.shape
         XX = X
         self.eval()
-        if cfg.model=='CycleMP':
+        if self.args.model=='CycleMP':
             net = self.netG_A
         else:
             net = self.netG
 
-        mul_channel = cfg.mul_channel
-        pan_channel = cfg.pan_channel
-        data_range = cfg.data_range
+        mul_channel = self.args.mul_channel
+        pan_channel = self.args.pan_channel
+        data_range = self.args.data_range
         
         """eval"""
         # print('evaling...')

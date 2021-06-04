@@ -1,0 +1,29 @@
+import os
+
+cmds = [
+    "python train.py -m ours -ms F16B2 -d D:\\实验\\影像融合\\IKONOS\\train_dataset -td D:\\实验\\影像融合\\IKONOS\\test_dataset -sd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\results\\IKONOS\\result -cd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\checkpoints\\IKONOS\\checkpoints_dir",
+    "python train.py -m ours -ms F16B4 -d D:\\实验\\影像融合\\IKONOS\\train_dataset -td D:\\实验\\影像融合\\IKONOS\\test_dataset -sd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\results\\IKONOS\\result -cd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\checkpoints\\IKONOS\\checkpoints_dir",
+    "python train.py -m ours -ms F16B6 -d D:\\实验\\影像融合\\IKONOS\\train_dataset -td D:\\实验\\影像融合\\IKONOS\\test_dataset -sd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\results\\IKONOS\\result -cd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\checkpoints\\IKONOS\\checkpoints_dir",
+    "python train.py -m ours -ms F16B8 -d D:\\实验\\影像融合\\IKONOS\\train_dataset -td D:\\实验\\影像融合\\IKONOS\\test_dataset -sd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\results\\IKONOS\\result -cd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\checkpoints\\IKONOS\\checkpoints_dir",
+    "python train.py -m ours -ms F32B2 -d D:\\实验\\影像融合\\IKONOS\\train_dataset -td D:\\实验\\影像融合\\IKONOS\\test_dataset -sd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\results\\IKONOS\\result -cd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\checkpoints\\IKONOS\\checkpoints_dir",
+    "python train.py -m ours -ms F32B4 -d D:\\实验\\影像融合\\IKONOS\\train_dataset -td D:\\实验\\影像融合\\IKONOS\\test_dataset -sd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\results\\IKONOS\\result -cd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\checkpoints\\IKONOS\\checkpoints_dir",
+    "python train.py -m ours -ms F32B6 -d D:\\实验\\影像融合\\IKONOS\\train_dataset -td D:\\实验\\影像融合\\IKONOS\\test_dataset -sd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\results\\IKONOS\\result -cd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\checkpoints\\IKONOS\\checkpoints_dir",
+    "python train.py -m ours -ms F32B8 -d D:\\实验\\影像融合\\IKONOS\\train_dataset -td D:\\实验\\影像融合\\IKONOS\\test_dataset -sd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\results\\IKONOS\\result -cd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\checkpoints\\IKONOS\\checkpoints_dir",
+    "python train.py -m ours -ms F48B2 -d D:\\实验\\影像融合\\IKONOS\\train_dataset -td D:\\实验\\影像融合\\IKONOS\\test_dataset -sd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\results\\IKONOS\\result -cd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\checkpoints\\IKONOS\\checkpoints_dir",
+    "python train.py -m ours -ms F48B4 -d D:\\实验\\影像融合\\IKONOS\\train_dataset -td D:\\实验\\影像融合\\IKONOS\\test_dataset -sd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\results\\IKONOS\\result -cd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\checkpoints\\IKONOS\\checkpoints_dir",
+    "python train.py -m ours -ms F48B6 -d D:\\实验\\影像融合\\IKONOS\\train_dataset -td D:\\实验\\影像融合\\IKONOS\\test_dataset -sd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\results\\IKONOS\\result -cd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\checkpoints\\IKONOS\\checkpoints_dir",
+    "python train.py -m ours -ms F48B8 -d D:\\实验\\影像融合\\IKONOS\\train_dataset -td D:\\实验\\影像融合\\IKONOS\\test_dataset -sd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\results\\IKONOS\\result -cd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\checkpoints\\IKONOS\\checkpoints_dir",
+    "python train.py -m ours -ms F64B2 -d D:\\实验\\影像融合\\IKONOS\\train_dataset -td D:\\实验\\影像融合\\IKONOS\\test_dataset -sd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\results\\IKONOS\\result -cd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\checkpoints\\IKONOS\\checkpoints_dir",
+    "python train.py -m ours -ms F64B4 -d D:\\实验\\影像融合\\IKONOS\\train_dataset -td D:\\实验\\影像融合\\IKONOS\\test_dataset -sd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\results\\IKONOS\\result -cd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\checkpoints\\IKONOS\\checkpoints_dir",
+    "python train.py -m ours -ms F64B6 -d D:\\实验\\影像融合\\IKONOS\\train_dataset -td D:\\实验\\影像融合\\IKONOS\\test_dataset -sd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\results\\IKONOS\\result -cd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\checkpoints\\IKONOS\\checkpoints_dir",
+    "python train.py -m ours -ms F64B8 -d D:\\实验\\影像融合\\IKONOS\\train_dataset -td D:\\实验\\影像融合\\IKONOS\\test_dataset -sd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\results\\IKONOS\\result -cd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\checkpoints\\IKONOS\\checkpoints_dir",
+    
+]
+
+for cmd in cmds:
+    os.system(cmd)
+
+# python train.py -m ours -ms F64B2SR_PLB_PHB_AEL -d D:\\实验\\影像融合\\QuickBird\\dataset\\train_dataset -td D:\\实验\\影像融合\\QuickBird\\dataset\\test_dataset -sd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\results\\QuickBird\\result -cd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\checkpoints\\QuickBird\\checkpoints_dir
+# python train.py -m ours -ms F64B2SR_PLB_PHB_AEH -d D:\\实验\\影像融合\\QuickBird\\dataset\\train_dataset -td D:\\实验\\影像融合\\QuickBird\\dataset\\test_dataset -sd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\results\\QuickBird\\result -cd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\checkpoints\\QuickBird\\checkpoints_dir
+# python train.py -m ours -ms F64B2SR_PLB_PHB_AEL -d D:\\实验\\影像融合\\WashingtonDC_View-Ready_8_Band_Bundle_40cm\\055675869040\\dataset\\train_dataset -td D:\\实验\\影像融合\\WashingtonDC_View-Ready_8_Band_Bundle_40cm\\055675869040\\dataset\\test_dataset -sd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\results\\WV2\\result -cd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\checkpoints\\WV2\\checkpoints_dir -pc 1 -mc 8
+# python train.py -m ours -ms F64B2SR_PLB_PHB_AEH -d D:\\实验\\影像融合\\WashingtonDC_View-Ready_8_Band_Bundle_40cm\\055675869040\\dataset\\train_dataset -td D:\\实验\\影像融合\\WashingtonDC_View-Ready_8_Band_Bundle_40cm\\055675869040\\dataset\\test_dataset -sd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\results\\WV2\\result -cd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\checkpoints\\WV2\\checkpoints_dir -pc 1 -mc 8

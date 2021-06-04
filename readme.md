@@ -13,11 +13,11 @@ pip install -r requirements.txt
 
 ## 3 Dataset
 ### 3.1 QuickBird 
-
+https://pan.baidu.com/s/1bvuWyIagBcFzNTp4l1eImA ExtractCode:beqg
 ### 3.2 WorldView-2
-
+https://pan.baidu.com/s/1Gfe6-SGT9AKHD6NzAZyJzA ExtractCode:x0wx
 ### 3.2 IKONOS
-
+https://pan.baidu.com/s/11rJcRgW0n0OSimzuokH-6Q ExtractCode:4ky4
 ### 3.4 Perpercess Data
 1. You should use the code to clip the image by './data/clip_dataset.py'
 2. To train, you should split the dataset by random using the code './data/split_dataset.py
@@ -40,7 +40,7 @@ The detail of the setting can be seen by using --help. After running the file '_
 Use the './MATLAB/custum/eval_DL_method.m' to evalute the result
 
 ## 7 Train
-If training by yourself, firstly you must set the 'config.py' in our main directory. As following:
+If training by yourself, firstly you must set the parameters as following:
 ```python
 python train.py -m ours -ms F16B2 -d D:\\实验\\影像融合\\IKONOS\\train_dataset -td D:\\实验\\影像融合\\IKONOS\\test_dataset -sd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\results\\IKONOS\\result -cd D:\\实验\\影像融合\\Deep-Learning-PanSharpening\\checkpoints\\IKONOS\\checkpoints_dir
 ```

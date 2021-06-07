@@ -69,18 +69,18 @@ def transform(LR, HR, FR, args):
     
     
   
-    
+    # print(LR.shape, HR.shape, FR.shape)
     LR, HR, FR = LR.copy(), HR.copy(), FR.copy()
     return LR, HR, FR
 
 class PsDataset(data.Dataset):
     def __init__(self, args, apath, isAug=True, isUnlabel=False):
-        self.isAug = isAug
+        self.isAug = args.isAug
         self.isUnlabel = isUnlabel
         self.scale = args.scale
         # apath = cfg.dataDir
         self.args = args
-      
+        print(self.isAug, self.isUnlabel, self.scale)
         dirHR = 'HR'
         dirLR = 'LR'
         dirFR = 'FR'
@@ -110,13 +110,13 @@ class PsDataset(data.Dataset):
         FR = gdal_read(self.FRList[idx])
         lr, hr, fr = LR, HR, FR
         if self.isAug:
-            
             lr, hr, fr = self.transform(LR, HR, FR, self.args)
        
    
         lr = torch.Tensor(lr).float() / self.args.data_range
         hr = torch.Tensor(hr).float() / self.args.data_range
         fr = torch.Tensor(fr).float() / self.args.data_range
+        # print(lr.shape, hr.shape, fr.shape)
         return lr, hr, fr
         
     def __len__(self):

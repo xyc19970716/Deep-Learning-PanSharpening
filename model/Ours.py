@@ -329,7 +329,11 @@ class A2B_RCAN1(nn.Module): # 2020 0722
         self.part = part
         self.block_num = block_num
         self.upsample1 = Upsampler(conv=default_conv, scale=2, n_feats=nFeat, bn=False, act='relu') # act 使用激活函数relu bn改为true
-        self.upsample2 = Upsampler(conv=default_conv, scale=2, n_feats=nFeat, bn=False, act='relu') # act 使用激活函数relu bn改为true
+        if self.args.scale == 6:
+            self.upsample2 = Upsampler(conv=default_conv, scale=3, n_feats=nFeat, bn=False, act='relu') # act 使用激活函数relu bn改为true
+        else:
+            self.upsample2 = Upsampler(conv=default_conv, scale=2, n_feats=nFeat, bn=False, act='relu') # act 使用激活函数relu bn改为true
+
         self.mul_conv_1 = nn.Sequential(
             nn.Conv2d(in_channels=args.mul_channel, out_channels=nFeat, kernel_size=3, padding=1),
             nn.LeakyReLU(0.2), 
@@ -354,10 +358,17 @@ class A2B_RCAN1(nn.Module): # 2020 0722
                 self.pan_hp_res_1 = nn.Sequential(
                     self.make_layer(Blocks, block_num, nFeat),
                 ) 
-            self.pan_hp_conv_2 = nn.Sequential(
-                nn.Conv2d(in_channels=nFeat, out_channels=nFeat, kernel_size=3, stride=2, padding=1),
-                nn.LeakyReLU(0.2),
-            )
+            if self.args.scale == 6:
+                self.pan_hp_conv_2 = nn.Sequential(
+                    nn.Conv2d(in_channels=nFeat, out_channels=nFeat, kernel_size=3, stride=3, padding=1),
+                    nn.LeakyReLU(0.2),
+                )
+            else:
+                self.pan_hp_conv_2 = nn.Sequential(
+                    nn.Conv2d(in_channels=nFeat, out_channels=nFeat, kernel_size=3, stride=2, padding=1),
+                    nn.LeakyReLU(0.2),
+                )
+
             if self.block_num != 0:
                 self.pan_hp_res_2 = nn.Sequential(
                     self.make_layer(Blocks, block_num, nFeat),
@@ -379,10 +390,16 @@ class A2B_RCAN1(nn.Module): # 2020 0722
                 self.pan_lp_res_1 = nn.Sequential(
                     self.make_layer(Blocks, block_num, nFeat),
                 ) 
-            self.pan_lp_conv_2 = nn.Sequential(
-                nn.Conv2d(in_channels=nFeat, out_channels=nFeat, kernel_size=3, stride=2, padding=1),
-                nn.LeakyReLU(0.2),
-            )
+            if self.args.scale == 6:
+                self.pan_lp_conv_2 = nn.Sequential(
+                    nn.Conv2d(in_channels=nFeat, out_channels=nFeat, kernel_size=3, stride=3, padding=1),
+                    nn.LeakyReLU(0.2),
+                )
+            else:
+                self.pan_lp_conv_2 = nn.Sequential(
+                    nn.Conv2d(in_channels=nFeat, out_channels=nFeat, kernel_size=3, stride=2, padding=1),
+                    nn.LeakyReLU(0.2),
+                )
             if self.block_num != 0:
                 self.pan_lp_res_2 = nn.Sequential(
                     self.make_layer(Blocks, block_num, nFeat),
@@ -407,11 +424,16 @@ class A2B_RCAN1(nn.Module): # 2020 0722
                 nn.Conv2d(in_channels=nFeat, out_channels=nFeat, kernel_size=3, stride=1, padding=1),
                 nn.LeakyReLU(0.2),
             )
-
-            self.encode3 = nn.Sequential(
-                nn.Conv2d(in_channels=nFeat, out_channels=nFeat*2, kernel_size=3, stride=2, padding=1),
-                nn.LeakyReLU(0.2),
-            )
+            if self.args.scale == 6:
+                self.encode3 = nn.Sequential(
+                    nn.Conv2d(in_channels=nFeat, out_channels=nFeat*2, kernel_size=3, stride=3, padding=1),
+                    nn.LeakyReLU(0.2),
+                )
+            else:
+                self.encode3 = nn.Sequential(
+                    nn.Conv2d(in_channels=nFeat, out_channels=nFeat*2, kernel_size=3, stride=2, padding=1),
+                    nn.LeakyReLU(0.2),
+                )
 
             self.encode4 = nn.Sequential(
                 nn.Conv2d(in_channels=nFeat*2, out_channels=nFeat*4, kernel_size=3, stride=2, padding=1),
@@ -424,11 +446,16 @@ class A2B_RCAN1(nn.Module): # 2020 0722
                 nn.ConvTranspose2d(in_channels=nFeat*(4+2), out_channels=nFeat*3, kernel_size=2, stride=2, padding=0),
                 nn.LeakyReLU(0.2),
             )
-
-            self.decode2 = nn.Sequential(
-                nn.ConvTranspose2d(in_channels=nFeat*(3+2+2), out_channels=nFeat*3, kernel_size=2, stride=2, padding=0),
-                nn.LeakyReLU(0.2),
-            )
+            if self.args.scale == 6:
+                self.decode2 = nn.Sequential(
+                    nn.ConvTranspose2d(in_channels=nFeat*(3+2+2), out_channels=nFeat*3, kernel_size=3, stride=3, padding=0),
+                    nn.LeakyReLU(0.2),
+                )
+            else:
+                self.decode2 = nn.Sequential(
+                    nn.ConvTranspose2d(in_channels=nFeat*(3+2+2), out_channels=nFeat*3, kernel_size=2, stride=2, padding=0),
+                    nn.LeakyReLU(0.2),
+                )
 
             self.decode3 = nn.Sequential(
                 nn.Conv2d(in_channels=nFeat*(3+1+2), out_channels=nFeat, kernel_size=3, stride=1, padding=1),
@@ -439,11 +466,16 @@ class A2B_RCAN1(nn.Module): # 2020 0722
                 nn.ConvTranspose2d(in_channels=nFeat*(4+1), out_channels=nFeat*3, kernel_size=2, stride=2, padding=0),
                 nn.LeakyReLU(0.2),
             )
-
-            self.decode2 = nn.Sequential(
-                nn.ConvTranspose2d(in_channels=nFeat*(3+1+2), out_channels=nFeat*3, kernel_size=2, stride=2, padding=0),
-                nn.LeakyReLU(0.2),
-            )
+            if self.args.scale == 6:
+                self.decode2 = nn.Sequential(
+                    nn.ConvTranspose2d(in_channels=nFeat*(3+1+2), out_channels=nFeat*3, kernel_size=3, stride=3, padding=0),
+                    nn.LeakyReLU(0.2),
+                )
+            else:
+                self.decode2 = nn.Sequential(
+                    nn.ConvTranspose2d(in_channels=nFeat*(3+1+2), out_channels=nFeat*3, kernel_size=2, stride=2, padding=0),
+                    nn.LeakyReLU(0.2),
+                )
 
             self.decode3 = nn.Sequential(
                 nn.Conv2d(in_channels=nFeat*(3+1+1), out_channels=nFeat, kernel_size=3, stride=1, padding=1),
@@ -465,6 +497,7 @@ class A2B_RCAN1(nn.Module): # 2020 0722
         return nn.Sequential(*layers)
 
     def forward(self, x, y):
+        # print(x.shape, y.shape)
         x_up = self.bicubic(x, scale=self.args.scale)#torch.nn.functional.upsample(x, scale_factor=cfg.scale, mode='bicubic')
         
         x = self.mul_conv_1(x)
@@ -498,7 +531,7 @@ class A2B_RCAN1(nn.Module): # 2020 0722
             if self.block_num != 0:
                 y_3_lp = self.pan_lp_res_3(y_3_lp) + y_3_lp
         
-
+        # print(y_1_hp.shape, y_2_hp.shape, y_3_hp.shape)
         if self.part == 'TEST' or self.part == 'SR_PLB' or self.part == 'SR_PLB_PHB' or self.part == 'SR_PLB_PHB_AEL' or self.part == 'all':
             x = self.sau_l1(x, y_3_lp)
         if self.block_num != 0:
@@ -521,9 +554,11 @@ class A2B_RCAN1(nn.Module): # 2020 0722
             e2 = self.encode2(x)
             e3 = self.encode3(e2)
             e4 = self.encode4(e3) 
+        # print(e2.shape, e3.shape, e4.shape)
         if self.part == 'all': 
             d1 = self.decode1(torch.cat([e4, y_3_lp, y_3_hp], -3))
             d2 = self.decode2(torch.cat([d1, e3, y_2_lp, y_2_hp], -3))
+            # print(d1.shape, d2.shape)
             d3 = self.decode3(torch.cat([d2, e2, y_1_lp, y_1_hp], -3))
         elif self.part == 'SR_PLB_PHB_AEL': 
             d1 = self.decode1(torch.cat([e4, y_3_lp], -3))
@@ -632,7 +667,7 @@ class OursModel(BaseModel):
         elif args.model_sub=='F48B8':
             self.netG = networks.init_net(A2B_RCAN1(nFeat=48, block_num=8,args=args)).cuda()
         else:
-            self.netG = networks.init_net(A2B_RCAN1()).cuda()
+            self.netG = networks.init_net(A2B_RCAN1(args=args)).cuda()
       
 
         if self.isTrain:

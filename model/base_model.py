@@ -221,7 +221,7 @@ class BaseModel(ABC):
             hrms = Y
             clip_size = 128#128
             pad_num = clip_size // 4
-            scales = 4
+            scales = self.args.scale#4
             batch_idx = 0
             batch_iter = 0
             batch_size = 1#4

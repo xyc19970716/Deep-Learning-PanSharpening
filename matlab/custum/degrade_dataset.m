@@ -1,11 +1,11 @@
 % 下采样数据集
 % MS和PAN缩放因子
-ratio = 4;%4;
+ratio = 6;%4;%4;
 % 卫星
-sensor = 'GeoEye1';%'WV2';%'IKONOS';%'QB';%'WV3';%'none';%%%'WV3';%
+sensor = 'none';%'QB';%'WV3';%%%'WV3';%'GeoEye1';%'WV2';%'IKONOS';%
 
 % 需要处理的路径
-dataset_path = 'H:\大气校正\融合\dataset\train_dataset';%'D:\实验\影像融合\data\NBU_PansharpRSData\1 Satellite_Dataset\Dataset\6 WorldView-3\train_dataset';%D:/实验/融合数据集/SpaceNet挑选/test_dataset'; 1 IKONOS 6 WorldView-3 2 QuickBird 3 GaoFen-1 4 WorldView-4 5 WorldView-2
+dataset_path = 'H:\shouxian_sentinel\T50SMA\s2_pansharpen_data\dataset\train_dataset';%'D:\实验\影像融合\data\NBU_PansharpRSData\1 Satellite_Dataset\Dataset\6 WorldView-3\train_dataset';%D:/实验/融合数据集/SpaceNet挑选/test_dataset'; 1 IKONOS 6 WorldView-3 2 QuickBird 3 GaoFen-1 4 WorldView-4 5 WorldView-2
 % 原始MS存放路径
 dataset_ms_path = fullfile(dataset_path, 'MS');
 % 原始PAN存放路径

@@ -150,6 +150,7 @@ parser.add_argument("-lf", "--lr_decay_factor", type=float, default=0.5, help=""
 parser.add_argument("-e", "--epochs", type=int, default=1000, help="")
 parser.add_argument("-iu", "--isUnlabel", type=bool, default=False, help="")
 parser.add_argument("-ie", "--isEval", type=bool, default=False, help="")
+parser.add_argument("-ia", "--isAug", type=bool, default=True, help="")
 parser.add_argument("-uf", "--useFakePAN", type=bool, default=False, help="")
 parser.add_argument("-sensor", "--sensor", type=str, default="", help="")
 args = parser.parse_args()
@@ -238,8 +239,12 @@ elif args.model == 'SRPPNN':
 
 
 model.initialize(args)
-input1 = torch.randn(1, args.mul_channel, 64, 64).cuda()
-input2 = torch.randn(1, args.pan_channel, 256, 256).cuda()
+if args.scale == 6:
+    input1 = torch.randn(1, args.mul_channel, 64, 64).cuda()
+    input2 = torch.randn(1, args.pan_channel, 384, 384).cuda()
+else:
+    input1 = torch.randn(1, args.mul_channel, 64, 64).cuda()
+    input2 = torch.randn(1, args.pan_channel, 256, 256).cuda()
 flop, para = profile(model.netG, inputs=(input1, input2, ))
 print("%.2fM" % (flop/1e6), "%.2fM" % (para/1e6))
 

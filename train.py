@@ -34,7 +34,7 @@ import argparse
 
 def get_dataset(args):
 
-    data_train = PsDataset(args, apath=args.dataDir, isUnlabel=args.isUnlabel)#PsRamDataset(apath=cfg.dataDir, isUnlabel=cfg.isUnlabel)#LmdbDataset()#
+    data_train = PsDataset(args, apath=args.dataDir, isAug=args.isAug, isUnlabel=args.isUnlabel)#PsRamDataset(apath=cfg.dataDir, isUnlabel=cfg.isUnlabel)#LmdbDataset()#
     if args.isEval:
         train_data, test_data = Get_DataSet(data_train, [0.8, 0.2])
         dataloader = torch.utils.data.DataLoader(train_data, batch_size=args.batchSize,
@@ -144,8 +144,12 @@ def train(args):
     # cycle_gan.cuda()
 
     cycle_gan.setup()
-    input1 = torch.randn(1, args.mul_channel, 64, 64).cuda()
-    input2 = torch.randn(1, args.pan_channel, 256, 256).cuda()
+    if args.scale == 6:
+        input1 = torch.randn(1, args.mul_channel, 64, 64).cuda()
+        input2 = torch.randn(1, args.pan_channel, 384, 384).cuda()
+    else:
+        input1 = torch.randn(1, args.mul_channel, 64, 64).cuda()
+        input2 = torch.randn(1, args.pan_channel, 256, 256).cuda()
     flop, para = profile(cycle_gan.netG, inputs=(input1, input2, ))
     print("%.2fM" % (flop/1e6), "%.2fM" % (para/1e6))
   
@@ -347,6 +351,7 @@ if __name__ == '__main__':
     parser.add_argument("-e", "--epochs", type=int, default=1000, help="")
     parser.add_argument("-iu", "--isUnlabel", type=bool, default=False, help="")
     parser.add_argument("-ie", "--isEval", type=bool, default=False, help="")
+    parser.add_argument("-ia", "--isAug", type=bool, default=True, help="")
     parser.add_argument("-uf", "--useFakePAN", type=bool, default=False, help="")
     args = parser.parse_args()
     warnings.filterwarnings("ignore")

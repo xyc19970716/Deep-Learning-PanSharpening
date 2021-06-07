@@ -90,7 +90,7 @@ def world2Pixel(geoMatrix, x, y):
 
 # would like to update to clip image by the format of 16 bit
 satellite = '' #'wv2'
-input_data_path = r'D:\实验\影像融合\QB-Dataset'
+input_data_path = r'H:\shouxian_sentinel\T50SMA\s2_pansharpen_data\dataset'
 input_ms_path = glob.glob(os.path.join(os.path.join(input_data_path, 'MS'), '*.tif'))
 input_pan_path = glob.glob(os.path.join(os.path.join(input_data_path, 'PAN'), '*.tif'))
 print(input_ms_path, input_pan_path)
@@ -134,7 +134,7 @@ random.seed(0)
 random.shuffle(input_pan_path)
 
 
-border_idx = int(len(input_ms_path)-500)#int(len(input_ms_path) * (1-spilt_factor))#
+border_idx = int(len(input_ms_path) * (1-spilt_factor))#int(len(input_ms_path)-500)#
 
 # train
 print('开始随机分割数据集')

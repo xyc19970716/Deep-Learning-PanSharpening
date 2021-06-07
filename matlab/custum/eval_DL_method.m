@@ -6,11 +6,11 @@ L = 11;
 flag_cut_bounds = 1;
 dim_cut = 11;
 thvalues = 0;
-sensor = 'IKONOS';%'QB';%'WV2';%'GeoEye1';%'IKONOS';%''WV3';%'none';%'WV3';%'none';% %'none';%'IKONOS';%'WV3';%'none';%'WV3';'none';% %设置
+sensor = 'QB';%'WV2';%'IKONOS';%'IKONOS';%'GeoEye1';%''WV3';%'none';%'WV3';%'none';% %'none';%'IKONOS';%'WV3';%'none';%'WV3';'none';% %设置
 im_tag = 'none';%8;%'Tls1';%'none'; % 设置
 % 需要处理的路径
-test_dataset_path = 'D:\实验\影像融合\IKONOS\test_dataset';%'D:\实验\影像融合\data\NBU_PansharpRSData\1 Satellite_Dataset\Dataset\6 WorldView-3\test_dataset';%'D:/实验/融合数据集/SpaceNet挑选/test_dataset';
-test_dataset_path2 = 'D:\实验\影像融合\IKONOS\result\CycleMP\supervised';%'D:\实验\影像融合\data\NBU_PansharpRSData\1 Satellite_Dataset\Dataset\6 WorldView-3\result\Ours\supervised';%'D:/实验/PsCycleGAN/result/PanNet';5 WorldView-2 2 QuickBird 4 WorldView-4 6 WorldView-3 3 GaoFen-1 1 IKONOS
+test_dataset_path = 'D:\实验\影像融合\QuickBird\dataset\test_dataset';%'D:\实验\影像融合\data\NBU_PansharpRSData\1 Satellite_Dataset\Dataset\6 WorldView-3\test_dataset';%'D:/实验/融合数据集/SpaceNet挑选/test_dataset';
+test_dataset_path2 = 'D:\实验\影像融合\Deep-Learning-PanSharpening\results\QuickBird\result\oursF64B2SR_PLB_PHB_AEH\supervised';%'D:\实验\影像融合\data\NBU_PansharpRSData\1 Satellite_Dataset\Dataset\6 WorldView-3\result\Ours\supervised';%'D:/实验/PsCycleGAN/result/PanNet';5 WorldView-2 2 QuickBird 4 WorldView-4 6 WorldView-3 3 GaoFen-1 1 IKONOS
 save_path = fullfile(test_dataset_path, 'OursDIP.mat');
 % 下采样LR路径
 test_ms_path = fullfile(test_dataset_path, 'LR');

@@ -52,7 +52,7 @@ and https://github.com/zk31601102/ResidualDenseNetWork-CycleGAN-SuperResolution
 
 ## 9 Cite
 If you use DIPNet in your work, please cite our paper:
-###BibTex:
+### BibTex:
 @Article{rs13142800,
 AUTHOR = {Xie, Yuchen and Wu, Wei and Yang, Haiping and Wu, Ning and Shen, Ying},
 TITLE = {Detail Information Prior Net for Remote Sensing Image Pansharpening},
@@ -63,6 +63,5 @@ NUMBER = {14},
 ARTICLE-NUMBER = {2800},
 URL = {https://www.mdpi.com/2072-4292/13/14/2800},
 ISSN = {2072-4292},
-ABSTRACT = {Pansharpening, which fuses the panchromatic (PAN) band with multispectral (MS) bands to obtain an MS image with spatial resolution of the PAN images, has been a popular topic in remote sensing applications in recent years. Although the deep-learning-based pansharpening algorithm has achieved better performance than traditional methods, the fusion extracts insufficient spatial information from a PAN image, producing low-quality pansharpened images. To address this problem, this paper proposes a novel progressive PAN-injected fusion method based on superresolution (SR). The network extracts the detail features of a PAN image by using two-stream PAN input; uses a feature fusion unit (FFU) to gradually inject low-frequency PAN features, with high-frequency PAN features added after subpixel convolution; uses a plain autoencoder to inject the extracted PAN features; and applies a structural similarity index measure (SSIM) loss to focus on the structural quality. Experiments performed on different datasets indicate that the proposed method outperforms several state-of-the-art pansharpening methods in both visual appearance and objective indexes, and the SSIM loss can help improve the pansharpened quality on the original dataset.},
 DOI = {10.3390/rs13142800}
 }

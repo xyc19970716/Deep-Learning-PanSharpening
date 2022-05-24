@@ -16,16 +16,21 @@ pip install -r requirements.txt
 https://pan.baidu.com/s/1bvuWyIagBcFzNTp4l1eImA ExtractCode:beqg
 ### 3.2 WorldView-2
 https://pan.baidu.com/s/1Gfe6-SGT9AKHD6NzAZyJzA ExtractCode:x0wx
-### 3.2 IKONOS
+### 3.3 IKONOS
 https://pan.baidu.com/s/11rJcRgW0n0OSimzuokH-6Q ExtractCode:4ky4
-### 3.4 Perpercess Data
+### 3.4 Google Drive
+https://drive.google.com/drive/folders/1pCaxm0onGBPDWrpBSMD2d5sbc_1iMsCB?usp=sharing
+### 3.5 Perpercess Data
 1. You should use the code to clip the image by './data/clip_dataset.py'
 2. To train, you should split the dataset by random using the code './data/split_dataset.py
 3. Use the code from './MATLAB/custum/degrade_dataset.m' to create the simulate dataset
    
 
 ## 4 Pretrained Models
+### 4.1 Google Drive
+https://drive.google.com/drive/folders/11bzOwX8AUP0fldpZ_oUVExvY9HUPg8Yt?usp=sharing
 
+### 4.2 
 You should put the downloaded pretrained models under one satellite dataset model directory and the related method directory, such as 'QuickBird/checkpoints_dir/deep_learning_method/supervised'.
 
 ## 5 Test or Use To Pan-Sharpen
